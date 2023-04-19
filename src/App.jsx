@@ -19,16 +19,18 @@ const List = ({ list }) => (
 
 const InputWithLabel = ({
         id,
-        label,
         value,
         type = "text",
-        onInputChange }) => (
+        onInputChange,
+        isFocused,
+        children}) => (
         <>
-            <label htmlFor={id}>{label}</label>
+            <label htmlFor={id}>{children}</label>
             &nbsp;
             <input id={id}
                    type={type}
                    value={value}
+                   autoFocus={isFocused}
                    onChange={onInputChange}/>
         </>
     );
@@ -81,10 +83,12 @@ const App = ()  => {
         <h1>My Hacker Stories</h1>
         <InputWithLabel
             id="search"
-            label="Search:"
             value={searchTerm}
+            isFocused
             onInputChange={handleSearch}
-        />
+        >
+            <strong>Search: </strong>
+        </InputWithLabel>
         <hr/>
         <List list={searchedStories}/>
     </div>
