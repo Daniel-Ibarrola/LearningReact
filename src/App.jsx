@@ -56,9 +56,7 @@ const useStorageState = (key, initialState) => {
     return [value, setValue];
 }
 
-const App = ()  => {
-
-    const initialStories = [
+const initialStories = [
         {
             title: "React",
             url: "https://reactjs.org",
@@ -76,8 +74,27 @@ const App = ()  => {
           objectId: 1,
         }
     ]
-    const [stories, setStories] = React.useState(initialStories);
-    const [searchTerm, setSearchTerm] = useStorageState("search", "React");
+
+const getAsyncStories = () =>
+    new Promise((resolve) =>
+        setTimeout(
+            () => resolve({data: {stories: initialStories}}),
+            2000)
+    );
+
+
+const App = ()  => {
+
+    const [stories, setStories] = React.useState([]);
+
+    React.useEffect(() => {
+        getAsyncStories().then(result => {
+           setStories(result.data.stories);
+        });
+    },
+        []);  // Run the effect on mount and unmount of the component
+
+    const [searchTerm, setSearchTerm] = useStorageState("search", "");
 
     const handleSearch = (event) => {
         setSearchTerm(event.target.value);
