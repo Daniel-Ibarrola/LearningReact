@@ -1,6 +1,8 @@
 import * as React from "react";
 
-const Item = ({item}) => (
+const Item = ({item, onRemoveItem}) => {
+
+    return (
     <li>
         <span>
             <a href={item.url}>{item.title}</a>
@@ -8,12 +10,19 @@ const Item = ({item}) => (
         <span> {item.author}</span>
         <span> {item.num_comments}</span>
         <span> {item.points}</span>
+        <button type="button" onClick={() => onRemoveItem(item)}>Dismiss</button>
     </li>
-);
+)};
 
-const List = ({ list }) => (
+const List = ({ list, onRemoveItem }) => (
         <ul>
-            {list.map(item => <Item key={item.objectId} item={item}/>)}
+            {list.map((item) => (
+                <Item
+                    key={item.objectId}
+                    item={item}
+                    onRemoveItem={onRemoveItem}
+                />
+            ))}
         </ul>
 );
 
@@ -49,7 +58,7 @@ const useStorageState = (key, initialState) => {
 
 const App = ()  => {
 
-    const stories = [
+    const initialStories = [
         {
             title: "React",
             url: "https://reactjs.org",
@@ -66,8 +75,8 @@ const App = ()  => {
           points: 5,
           objectId: 1,
         }
-    ];
-
+    ]
+    const [stories, setStories] = React.useState(initialStories);
     const [searchTerm, setSearchTerm] = useStorageState("search", "React");
 
     const handleSearch = (event) => {
@@ -77,6 +86,13 @@ const App = ()  => {
     const searchedStories = stories.filter((story) =>
        story.title.toLowerCase().includes(searchTerm.toLowerCase())
     );
+
+    const handleRemoveStory = (item) => {
+       const newStories = stories.filter(
+           (story) => item.objectId !== story.objectId
+       );
+       setStories(newStories);
+    };
 
     return (
     <div>
@@ -90,7 +106,10 @@ const App = ()  => {
             <strong>Search: </strong>
         </InputWithLabel>
         <hr/>
-        <List list={searchedStories}/>
+        <List
+            list={searchedStories}
+            onRemoveItem={handleRemoveStory}
+        />
     </div>
     )
 };
