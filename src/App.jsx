@@ -1,13 +1,13 @@
 import * as React from "react";
 
-const Item = (props) => (
+const Item = ({item}) => (
     <li>
         <span>
-            <a href={props.item.url}>{props.item.title}</a>
+            <a href={item.url}>{item.title}</a>
         </span>
-        <span> {props.item.author}</span>
-        <span> {props.item.num_comments}</span>
-        <span> {props.item.points}</span>
+        <span> {item.author}</span>
+        <span> {item.num_comments}</span>
+        <span> {item.points}</span>
     </li>
 );
 
@@ -17,23 +17,29 @@ const List = ({ list }) => (
         </ul>
 );
 
-const Search = ({ onSearch }) => {
-
-    const handleChange = (event) => {
-        onSearch(event);
-    }
-
-    return (
+const Search = ({ onSearch, searchTerm }) => (
         <div>
             <label htmlFor="search">Search: </label>
-            <input id="search" type="text" onChange={handleChange}/>
+            <input id="search"
+                   type="text"
+                   value={searchTerm}
+                   onChange={onSearch}/>
         </div>
-    )
-};
+    );
+
+const useStorageState = (key, initialState) => {
+
+    const [value, setValue] = React.useState(
+        localStorage.getItem(key) || initialState);
+
+    React.useEffect(() => {
+        localStorage.setItem(key, value);
+    }, [key, value]);
+
+    return [value, setValue];
+}
 
 const App = ()  => {
-
-    const [searchTerm, setSearchTerm] = React.useState('');
 
     const stories = [
         {
@@ -54,6 +60,8 @@ const App = ()  => {
         }
     ];
 
+    const [searchTerm, setSearchTerm] = useStorageState("search", "React");
+
     const handleSearch = (event) => {
         setSearchTerm(event.target.value);
     }
@@ -65,7 +73,7 @@ const App = ()  => {
     return (
     <div>
         <h1>My Hacker Stories</h1>
-        <Search onSearch={handleSearch}/>
+        <Search onSearch={handleSearch} searchTerm={searchTerm}/>
         <hr/>
         <List list={searchedStories}/>
     </div>
