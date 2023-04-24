@@ -86,13 +86,19 @@ const getAsyncStories = () =>
 const App = ()  => {
 
     const [stories, setStories] = React.useState([]);
+    const [isLoading, setIsLoading] = React.useState(false);
+    const [isError, setIsError] = React.useState(false);
 
     React.useEffect(() => {
-        getAsyncStories().then(result => {
-           setStories(result.data.stories);
-        });
-    },
-        []);  // Run the effect on mount and unmount of the component
+        setIsLoading(true);
+        getAsyncStories()
+            .then(result => {
+               setStories(result.data.stories);
+               setIsLoading(false);
+            }).catch(
+            () => setIsError(true)
+        )
+    }, []);  // Run the effect on mount and unmount of the component
 
     const [searchTerm, setSearchTerm] = useStorageState("search", "");
 
@@ -123,10 +129,16 @@ const App = ()  => {
             <strong>Search: </strong>
         </InputWithLabel>
         <hr/>
-        <List
+        {isError && <p>Something went wrong...</p>}
+
+        {isLoading ?
+            <p>Loading...</p>
+            :
+            <List
             list={searchedStories}
             onRemoveItem={handleRemoveStory}
-        />
+            />
+        }
     </div>
     )
 };
