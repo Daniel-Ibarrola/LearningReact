@@ -83,20 +83,62 @@ const getAsyncStories = () =>
     );
 
 
+const removeStory = "REMOVE_STORY";
+const initFetchStory = "STORIES_FETCH_INIT";
+const successFetchStory = "STORIES_FETCH_SUCCESS";
+const failFetchStory = "STORY_FETCH_FAIL";
+
+const storiesReducer = (state, action) => {
+    switch (action.type) {
+        case removeStory:
+            return {
+                ...state,
+                data: state.data.filter(
+                    (story) => action.payload.objectId !== story.objectId
+                )
+            }
+        case initFetchStory:
+            return {
+                ...state,
+                isLoading: true,
+                isError: false
+            };
+        case successFetchStory:
+            return {
+                ...state,
+                data: action.payload,
+                isLoading: false,
+                isError: false
+            };
+        case failFetchStory:
+            return {
+                ...state,
+                isLoading: false,
+                isError: true
+            };
+        default:
+            throw new Error();
+    }
+}
+
+
 const App = ()  => {
 
-    const [stories, setStories] = React.useState([]);
-    const [isLoading, setIsLoading] = React.useState(false);
-    const [isError, setIsError] = React.useState(false);
+    const [stories, dispatchStories] = React.useReducer(
+        storiesReducer,
+        {data: [], isLoading: false, isError: false}
+    );
 
     React.useEffect(() => {
-        setIsLoading(true);
+        dispatchStories({type: initFetchStory})
         getAsyncStories()
             .then(result => {
-               setStories(result.data.stories);
-               setIsLoading(false);
+               dispatchStories({
+                   type: successFetchStory,
+                   payload: result.data.stories,
+               });
             }).catch(
-            () => setIsError(true)
+            () => dispatchStories({type: failFetchStory})
         )
     }, []);  // Run the effect on mount and unmount of the component
 
@@ -106,15 +148,15 @@ const App = ()  => {
         setSearchTerm(event.target.value);
     }
 
-    const searchedStories = stories.filter((story) =>
+    const searchedStories = stories.data.filter((story) =>
        story.title.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     const handleRemoveStory = (item) => {
-       const newStories = stories.filter(
-           (story) => item.objectId !== story.objectId
-       );
-       setStories(newStories);
+       dispatchStories({
+           type: removeStory,
+           payload: item,
+       });
     };
 
     return (
@@ -129,9 +171,9 @@ const App = ()  => {
             <strong>Search: </strong>
         </InputWithLabel>
         <hr/>
-        {isError && <p>Something went wrong...</p>}
+        {stories.isError && <p>Something went wrong...</p>}
 
-        {isLoading ?
+        {stories.isLoading ?
             <p>Loading...</p>
             :
             <List
