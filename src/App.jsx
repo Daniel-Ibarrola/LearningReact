@@ -18,7 +18,7 @@ const List = ({ list, onRemoveItem }) => (
         <ul>
             {list.map((item) => (
                 <Item
-                    key={item.objectId}
+                    key={item.objectID}
                     item={item}
                     onRemoveItem={onRemoveItem}
                 />
@@ -56,33 +56,6 @@ const useStorageState = (key, initialState) => {
     return [value, setValue];
 }
 
-const initialStories = [
-        {
-            title: "React",
-            url: "https://reactjs.org",
-            author: "Jordan Walke",
-            num_comments: 3,
-            points: 4,
-            objectId: 0
-        },
-        {
-          title: "Redux",
-          url: "https://redux.js.org",
-          author: "Dan Abramov, Andrew Clark",
-          num_comments: 5,
-          points: 5,
-          objectId: 1,
-        }
-    ]
-
-const getAsyncStories = () =>
-    new Promise((resolve) =>
-        setTimeout(
-            () => resolve({data: {stories: initialStories}}),
-            2000)
-    );
-
-
 const removeStory = "REMOVE_STORY";
 const initFetchStory = "STORIES_FETCH_INIT";
 const successFetchStory = "STORIES_FETCH_SUCCESS";
@@ -94,7 +67,7 @@ const storiesReducer = (state, action) => {
             return {
                 ...state,
                 data: state.data.filter(
-                    (story) => action.payload.objectId !== story.objectId
+                    (story) => action.payload.objectID !== story.objectID
                 )
             }
         case initFetchStory:
@@ -122,6 +95,9 @@ const storiesReducer = (state, action) => {
 }
 
 
+const API_ENDPOINT = "https://hn.algolia.com/api/v1/search?query="
+
+
 const App = ()  => {
 
     const [stories, dispatchStories] = React.useReducer(
@@ -130,16 +106,17 @@ const App = ()  => {
     );
 
     React.useEffect(() => {
-        dispatchStories({type: initFetchStory})
-        getAsyncStories()
-            .then(result => {
-               dispatchStories({
-                   type: successFetchStory,
-                   payload: result.data.stories,
-               });
-            }).catch(
-            () => dispatchStories({type: failFetchStory})
-        )
+        dispatchStories({type: initFetchStory});
+        fetch(`${API_ENDPOINT}react`)
+            .then(response => response.json())
+            .then((result) => {
+                dispatchStories({
+                    type: successFetchStory,
+                    payload: result.hits,
+                })
+
+            })
+            .catch(() => dispatchStories({type: failFetchStory}))
     }, []);  // Run the effect on mount and unmount of the component
 
     const [searchTerm, setSearchTerm] = useStorageState("search", "");
