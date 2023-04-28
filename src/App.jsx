@@ -1,4 +1,6 @@
 import * as React from "react";
+import axios from "axios";
+
 
 const Item = ({item, onRemoveItem}) => {
 
@@ -114,19 +116,19 @@ const App = ()  => {
         {data: [], isLoading: false, isError: false}
     );
 
-    const handleFetchStories = React.useCallback(() => {
+    const handleFetchStories = React.useCallback(async () => {
         dispatchStories({type: initFetchStory});
 
-        fetch(url)
-            .then(response => response.json())
-            .then((result) => {
-                dispatchStories({
-                    type: successFetchStory,
-                    payload: result.hits,
-                })
-
-            })
-            .catch(() => dispatchStories({type: failFetchStory}))
+        try{
+            const result = await axios.get(url);
+            dispatchStories({
+                type: successFetchStory,
+                payload: result.data.hits,
+            });
+        } catch {
+            dispatchStories({type: failFetchStory});
+        }
+        
     }, [url]);
 
     React.useEffect(() => {
