@@ -100,7 +100,14 @@ const API_ENDPOINT = "https://hn.algolia.com/api/v1/search?query="
 
 const App = ()  => {
 
-    const [searchTerm, setSearchTerm] = useStorageState("search", "react");
+    const [searchTerm, setSearchTerm] = useStorageState(
+        "search",
+        "react"
+    );
+
+    const [url, setUrl] = React.useState(
+        `${API_ENDPOINT}${searchTerm}`
+    );
 
     const [stories, dispatchStories] = React.useReducer(
         storiesReducer,
@@ -108,11 +115,9 @@ const App = ()  => {
     );
 
     const handleFetchStories = React.useCallback(() => {
-        if (!searchTerm) return;
-
         dispatchStories({type: initFetchStory});
 
-        fetch(`${API_ENDPOINT}${searchTerm}`)
+        fetch(url)
             .then(response => response.json())
             .then((result) => {
                 dispatchStories({
@@ -122,17 +127,15 @@ const App = ()  => {
 
             })
             .catch(() => dispatchStories({type: failFetchStory}))
-    }, [searchTerm]);
+    }, [url]);
 
     React.useEffect(() => {
         handleFetchStories();
     }, [handleFetchStories]);
 
-
-    const handleSearch = (event) => {
+    const handleSearchInput = (event) => {
         setSearchTerm(event.target.value);
     }
-
 
     const handleRemoveStory = (item) => {
        dispatchStories({
@@ -141,6 +144,10 @@ const App = ()  => {
        });
     };
 
+    const handleSearchSubmit = () => {
+        setUrl(`${API_ENDPOINT}${searchTerm}`);
+    }
+
     return (
     <div>
         <h1>My Hacker Stories</h1>
@@ -148,10 +155,15 @@ const App = ()  => {
             id="search"
             value={searchTerm}
             isFocused
-            onInputChange={handleSearch}
+            onInputChange={handleSearchInput}
         >
             <strong>Search: </strong>
         </InputWithLabel>
+        <button type="button"
+                disabled={!searchTerm}
+                onClick={handleSearchSubmit}>
+            Submit
+        </button>
         <hr/>
         {stories.isError && <p>Something went wrong...</p>}
 
