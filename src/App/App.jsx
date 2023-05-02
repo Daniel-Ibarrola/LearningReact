@@ -1,67 +1,8 @@
 import * as React from "react";
 import axios from "axios";
 
-
-const Item = ({item, onRemoveItem}) => {
-
-    return (
-    <li>
-        <span>
-            <a href={item.url}>{item.title}</a>
-        </span>
-        <span>{item.author}</span>
-        <span>{item.num_comments}</span>
-        <span>{item.points}</span>
-        <button type="button" onClick={() => onRemoveItem(item)}>Dismiss</button>
-    </li>
-)};
-
-const List = ({ list, onRemoveItem }) => (
-        <ul>
-            {list.map((item) => (
-                <Item
-                    key={item.objectID}
-                    item={item}
-                    onRemoveItem={onRemoveItem}
-                />
-            ))}
-        </ul>
-);
-
-const InputWithLabel = ({
-        id,
-        value,
-        type = "text",
-        onInputChange,
-        isFocused,
-        children}) => (
-        <>
-            <label htmlFor={id}>{children}</label>
-            &nbsp;
-            <input id={id}
-                   type={type}
-                   value={value}
-                   autoFocus={isFocused}
-                   onChange={onInputChange}/>
-        </>
-    );
-
-
-const SearchForm = ({searchTerm, onSearchInput, onSearchSubmit}) => (
-     <form onSubmit={onSearchSubmit}>
-             <InputWithLabel
-                id="search"
-                value={searchTerm}
-                isFocused
-                onInputChange={onSearchInput}
-             >
-                <strong>Search: </strong>
-            </InputWithLabel>
-            <button type="submit" disabled={!searchTerm}>
-                Submit
-            </button>
-    </form>
-);
+import { List } from "../List/index.js";
+import { SearchForm } from "../SearchForm/index.js";
 
 
 const useStorageState = (key, initialState) => {
@@ -197,4 +138,4 @@ const App = ()  => {
 
 export default App;
 
-export {storiesReducer, actions, SearchForm, InputWithLabel, List, Item};
+export {App, storiesReducer, actions};
