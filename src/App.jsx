@@ -76,34 +76,37 @@ const useStorageState = (key, initialState) => {
     return [value, setValue];
 }
 
-const removeStory = "REMOVE_STORY";
-const initFetchStory = "STORIES_FETCH_INIT";
-const successFetchStory = "STORIES_FETCH_SUCCESS";
-const failFetchStory = "STORY_FETCH_FAIL";
+const actions = {
+    removeStory: "REMOVE_STORY",
+    initFetchStory: "STORIES_FETCH_INIT",
+    successFetchStory: "STORIES_FETCH_SUCCESS",
+    failFetchStory: "STORY_FETCH_FAIL",
+}
+
 
 const storiesReducer = (state, action) => {
     switch (action.type) {
-        case removeStory:
+        case actions.removeStory:
             return {
                 ...state,
                 data: state.data.filter(
                     (story) => action.payload.objectID !== story.objectID
                 )
             }
-        case initFetchStory:
+        case actions.initFetchStory:
             return {
                 ...state,
                 isLoading: true,
                 isError: false
             };
-        case successFetchStory:
+        case actions.successFetchStory:
             return {
                 ...state,
                 data: action.payload,
                 isLoading: false,
                 isError: false
             };
-        case failFetchStory:
+        case actions.failFetchStory:
             return {
                 ...state,
                 isLoading: false,
@@ -135,16 +138,16 @@ const App = ()  => {
     );
 
     const handleFetchStories = React.useCallback(async () => {
-        dispatchStories({type: initFetchStory});
+        dispatchStories({type: actions.initFetchStory});
 
         try{
             const result = await axios.get(url);
             dispatchStories({
-                type: successFetchStory,
+                type: actions.successFetchStory,
                 payload: result.data.hits,
             });
         } catch {
-            dispatchStories({type: failFetchStory});
+            dispatchStories({type: actions.failFetchStory});
         }
 
     }, [url]);
@@ -159,7 +162,7 @@ const App = ()  => {
 
     const handleRemoveStory = (item) => {
        dispatchStories({
-           type: removeStory,
+           type: actions.removeStory,
            payload: item,
        });
     };
@@ -193,3 +196,5 @@ const App = ()  => {
 };
 
 export default App;
+
+export {storiesReducer, actions, SearchForm, InputWithLabel, List, Item};
