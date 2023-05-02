@@ -125,7 +125,7 @@ const App = ()  => {
 
     const [searchTerm, setSearchTerm] = useStorageState(
         "search",
-        "react"
+        "React"
     );
 
     const [url, setUrl] = React.useState(
