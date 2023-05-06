@@ -1,4 +1,5 @@
 import * as React from "react";
+import "./style.css";
 
 const InputWithLabel = ({
                             id,
@@ -8,13 +9,15 @@ const InputWithLabel = ({
                             isFocused,
                             children}) => (
     <>
-        <label htmlFor={id}>{children}</label>
+        <label htmlFor={id} className="label">{children}</label>
         &nbsp;
         <input id={id}
                type={type}
                value={value}
                autoFocus={isFocused}
-               onChange={onInputChange}/>
+               onChange={onInputChange}
+               className="input"
+        />
     </>
 );
 

@@ -3,7 +3,7 @@ import axios from "axios";
 
 import { List } from "../List/index.js";
 import { SearchForm } from "../SearchForm/index.js";
-
+import "./style.css";
 
 const useStorageState = (key, initialState) => {
 
@@ -114,14 +114,13 @@ const App = ()  => {
     }
 
     return (
-    <div>
-        <h1>My Hacker Stories</h1>
+    <div className="container">
+        <h1 className="headline-primary">My Hacker Stories</h1>
         <SearchForm
             searchTerm={searchTerm}
             onSearchInput={handleSearchInput}
             onSearchSubmit={handleSearchSubmit}
         />
-        <hr/>
         {stories.isError && <p>Something went wrong...</p>}
 
         {stories.isLoading ?
